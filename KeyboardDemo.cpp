@@ -22,7 +22,8 @@ struct VertexPos
 KeyboardDemo::KeyboardDemo( ) : solidColorVS_( 0 ), solidColorPS_( 0 ),
                                     inputLayout_( 0 ), vertexBuffer_( 0 ),
                                     colorMap_( 0 ), colorMapSampler_( 0 ),
-                                    mvpCB_( 0 ), alphaBlendState_( 0 ), w(200), y(400),z(50)
+                                    mvpCB_( 0 ), alphaBlendState_( 0 ), w(320.0), y(5.0),z(350.0), i(0.0), y2(250.0), direction(0),
+									xCoordinate(220.0), yCoordinate(400.0)
 {
 
 }
@@ -106,9 +107,9 @@ bool KeyboardDemo::LoadContent( )
 	d3dResult = D3DX11CreateShaderResourceViewFromFile( d3dDevice_,
         "picture1.dds", 0, 0, &colorMap2_, 0 );
 	d3dResult = D3DX11CreateShaderResourceViewFromFile( d3dDevice_,
-        "picture2.dds", 0, 0, &colorMap3_, 0 );
+        "ponghitbox.dds", 0, 0, &colorMap3_, 0 );
 	d3dResult = D3DX11CreateShaderResourceViewFromFile( d3dDevice_,
-        "picture4.dds", 0, 0, &colorMap4_, 0 );
+        "racket.dds", 0, 0, &colorMap4_, 0 );
     if( FAILED( d3dResult ) )
     {
         DXTRACE_MSG( "Failed to load the texture image!" );
@@ -248,15 +249,14 @@ bool KeyboardDemo::LoadContent( )
 
     d3dResult = d3dDevice_->CreateBuffer( &vertexDesc2, &resourceData2, &vertexBuffer3_ );
 
-	for(int i = 0.0; i < 1;i++)
-	{
-		for(int j = 0; j < 13;j++)
-		{
-			XMFLOAT2 sprite2Pos( 400.0f, (float)(j*50));
-			sprites2_[j].SetPosition( sprite2Pos );
-		}
-	}
-
+	XMFLOAT2 sprite2Pos(xCoordinate, yCoordinate);
+	sprites2_[0].SetPosition(sprite2Pos);
+	XMFLOAT2 sprite3Pos(xCoordinate+105.0f, yCoordinate);
+	sprites2_[1].SetPosition(sprite3Pos);
+	XMFLOAT2 sprite4Pos(xCoordinate, yCoordinate-17.0f);
+	sprites2_[2].SetPosition(sprite4Pos);
+	XMFLOAT2 sprite5Pos(xCoordinate+105.0f, yCoordinate-17.0f);
+	sprites2_[3].SetPosition(sprite5Pos);
 	//end of 3rd
 
     D3D11_BLEND_DESC blendDesc;
@@ -315,7 +315,7 @@ void KeyboardDemo::Update( float dt )
 	if( KEYDOWN( prevKeyboardKeys_, DIK_DOWN ) && !KEYDOWN( keyboardKeys_, DIK_DOWN ) )
 	{ 
 		selectedColor_=1;
-		y= y - 5.0;
+		y= y - 20.0;
 		//q=q+10.0f;
 		//e=e+10.0f;
 	}
@@ -324,100 +324,156 @@ void KeyboardDemo::Update( float dt )
 	if( KEYDOWN( prevKeyboardKeys_, DIK_RIGHT ) && !KEYDOWN( keyboardKeys_, DIK_RIGHT ) )
 	{ 
 		selectedColor_=1;
-		w= w + 5.0;
+		w= w + 20.0;
 	}
 	if( KEYDOWN( prevKeyboardKeys_, DIK_UP ) && !KEYDOWN( keyboardKeys_, DIK_UP ) )
 	{ 
 		selectedColor_=1;
-		y= y + 5.0;
+		y= y + 20.0;
 	}
 	if( KEYDOWN( prevKeyboardKeys_, DIK_LEFT ) && !KEYDOWN( keyboardKeys_, DIK_LEFT ) )
 	{ 
 		selectedColor_=1;
-		w= w - 5.0;
+		w= w - 20.0;
 	}
-	else
+	/*
+	Directions:
+	0 = South
+	1 = NorthWest
+	2 = NorthEast
+	3 = SouthEast
+	4 = SouthWest
+	5 = North
+	*/
+	if(direction == 0)
 	{
-		selectedColor_=2;
+		y2 -= 5.0f;
 	}
+	//right side of paddle hit
+	for(int i = 0; i < 3; i++)
+	{
+
+		if((z > sprites2_[i].GetPositionX()-50 && z < sprites2_[i].GetPositionX()+50.0) && (y2 > sprites2_[i].GetPositionY() && y2 < sprites2_[i].GetPositionY() + 20))
+	{
+		XMFLOAT2 sprite2Pos(-500.0f, -500.0f);
+		sprites2_[i].SetPosition(sprite2Pos);
+	}
+	}
+	if((z > w && z < w+37.5) && (y2 > y && y2 < y + 10) && z > 794.9 && z < 800.0)
+	{
+		direction = 1;
+	}
+	if((z > w && z < w+37.5) && (y2 > y && y2 < y + 10) && direction == 3)
+	{
+		direction = 1;
+	}
+	if((z > w && z < w+37.5) && (y2 > y && y2 < y + 10))
+	{
+		direction = 1;
+	}
+	if((z > w-37.5 && z < w) && (y2 > y && y2 < y + 10) && direction != 4)
+	{
+		direction = 2;
+	}
+	if((z > w-37.5 && z < w) && (y2 > y && y2 < y + 10) && direction == 4)
+	{
+		direction =1;
+	}
+	//if(direction == 1 && y2 <= 600 && z != 0.0)
+	//{
+	//	z -=5.0f;
+	//	y2 += 5.0f;
+	//}
+	//paddle hit right side from left side
+	if(direction == 1 && z != -1.0)
+	{
+		if(z == 0.0)
+		{
+		direction = 2;
+		z -= 5.0f;
+		y2 +=5.0f;
+		}
+		if(y2 == 600)
+		{
+			direction = 4;
+		}
+		z -= 5.0f;
+		y2 +=5.0f;
+	}
+	if(direction == 2 && y2 !=605.0)
+		{
+			if(z == 800.0)
+			{
+				direction = 1;
+			}
+			if(y2 == 600.0)
+			{
+				direction = 3;
+			}
+		z += 5.0f;
+		y2 +=5.0f;
+		}
+	// top of the screen hit from left side
+	if(direction == 3 && z != 805.0)
+	{
+		if(z==800.0)
+		{
+			direction = 4;
+		}
+		z += 5.0f;
+		y2 -= 5.0f;
+	}
+	// top of the screen hit from left side
+	if(direction == 4)
+	{
+		if(z == 0.0)
+		{
+			direction = 3;
+		}
+		y2 -= 5.0f;
+		z -= 5.0f;
+	}
+	//right side hit from left side
+	if(direction==6)
+	{
+		z+= 5.0f;
+		y2 +=5.0f;
+	}
+	if(i == 7)
+	{
+		z -= 5.0f;
+		y2 -= 5.0f;
+	}
+	if(i == 8)
+	{
+		
+		z -= 5.0f;
+		y2 -= 5.0f;
+	}
+	/*if(i >= 0.0 && i < 500.0)
+	{
+			//z += 5.0f;
+			y2 -= 5.0f;
+			i += 5.0f;
+	}
+	if(i > 499.9 && i < 1000.0)
+	{
+		//z -= 5.0f;
+		y2 -= 5.0f;
+		i += 5.0f;
+	}*/
     memcpy( prevKeyboardKeys_, keyboardKeys_, sizeof( keyboardKeys_ ) );
 
 
 }
-/*void KeyboardDemo::Render2(  )
+void KeyboardDemo::Update2( float dt )
 {
-    
-	if( d3dContext_ == 0 )
-        return;
-    float clearColor[4] = { 0.112f, 0.176f, 0.25f, 1.0f };
-    d3dContext_->ClearRenderTargetView( backBufferTarget_, clearColor );
 
-    unsigned int stride = sizeof( VertexPos );
-    unsigned int offset = 0;
-
-    d3dContext_->IASetInputLayout( inputLayout_ );
-    d3dContext_->IASetVertexBuffers( 0, 1, &vertexBuffer_, &stride, &offset );
-    d3dContext_->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-
-    d3dContext_->VSSetShader( solidColorVS_, 0, 0 );
-    d3dContext_->PSSetShader( solidColorPS_, 0, 0 );
-    d3dContext_->PSSetShaderResources( 0, 1, &colorMap2_ );
-    d3dContext_->PSSetSamplers( 0, 1, &colorMapSampler_ );
-	float i = 10.0;
-	int j = 0;
-	while(selectedColor_==2)
+	if(i == 750.0)
 	{
-	ID3D11Resource* colorTex;
-    colorMap_->GetResource( &colorTex );
-
-    D3D11_TEXTURE2D_DESC colorTexDesc;
-    ( ( ID3D11Texture2D* )colorTex )->GetDesc( &colorTexDesc );
-    colorTex->Release( );
-
-    float halfWidth = ( float )colorTexDesc.Width / 2.0f;
-    float halfHeight = ( float )colorTexDesc.Height / 2.0f;
-
-	
-     VertexPos pogim[] =
-    {
-        { XMFLOAT3(  halfWidth,  halfHeight, 1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
-        { XMFLOAT3(  halfWidth, -halfHeight, 1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
-        { XMFLOAT3( -halfWidth, -halfHeight, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
-
-        { XMFLOAT3( -halfWidth, -halfHeight, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
-        { XMFLOAT3( -halfWidth,  halfHeight, 1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
-        { XMFLOAT3(  halfWidth,  halfHeight, 1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
-
-		{ XMFLOAT3( -halfWidth, -halfHeight, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) },
-        { XMFLOAT3( -halfWidth,  halfHeight, 1.0f ), XMFLOAT2( 0.0f, 0.0f ) },
-        { XMFLOAT3(  halfWidth,  halfHeight, 1.0f ), XMFLOAT2( 1.0f, 0.0f ) },
-    };
-    D3D11_BUFFER_DESC vertexDesc;
-    ZeroMemory( &vertexDesc, sizeof( vertexDesc ) );
-    vertexDesc.Usage = D3D11_USAGE_DEFAULT;
-    vertexDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    vertexDesc.ByteWidth = sizeof( VertexPos ) * 6;
-
-    D3D11_SUBRESOURCE_DATA resourceData;
-    ZeroMemory( &resourceData, sizeof( resourceData ) );
-    resourceData.pSysMem = pogim;
-    HRESULT d3dResult = d3dDevice_->CreateBuffer( &vertexDesc, &resourceData, &vertexBuffer2_ );
-		d3dContext_->PSSetShaderResources( 0, 1, &colorMap_ );
-		d3dContext_->IASetVertexBuffers( 0, 1, &vertexBuffer2_, &stride, &offset );
-		XMFLOAT2 sprite2Pos( i+q, i+e );
-    sprites3_[j].SetPosition( sprite2Pos );
-		XMMATRIX world = sprites3_[j].GetWorldMatrix( );
-        XMMATRIX mvp = XMMatrixMultiply( world, vpMatrix_ );
-        mvp = XMMatrixTranspose( mvp );
-        d3dContext_->UpdateSubresource( mvpCB_, 0, 0, &mvp, 0, 0 );
-        d3dContext_->VSSetConstantBuffers( 0, 1, &mvpCB_ );
-		i = i+10.0;
-		j++;
-		d3dContext_->Draw( 6, 0 );
+		z += 40.0f;
 	}
-		swapChain_->Present( 0, 0 );
 }
-*/
 void KeyboardDemo::Render( )
 {
     if( d3dContext_ == 0 )
@@ -429,33 +485,19 @@ void KeyboardDemo::Render( )
     unsigned int offset = 0;
 
     d3dContext_->IASetInputLayout( inputLayout_ );
-    d3dContext_->IASetVertexBuffers( 0, 1, &vertexBuffer_, &stride, &offset );
     d3dContext_->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
     d3dContext_->VSSetShader( solidColorVS_, 0, 0 );
     d3dContext_->PSSetShader( solidColorPS_, 0, 0 );
     d3dContext_->PSSetShaderResources( 0, 1, &colorMap2_ );
     d3dContext_->PSSetSamplers( 0, 1, &colorMapSampler_ );
-	/*
-	//Vertical Lines
-	for( int i = 0; i < 20; i++ )
-    {
-        XMMATRIX world = sprites_[i].GetWorldMatrix( );
-        XMMATRIX mvp = XMMatrixMultiply( world, vpMatrix_ );
-        mvp = XMMatrixTranspose( mvp );
-
-        d3dContext_->UpdateSubresource( mvpCB_, 0, 0, &mvp, 0, 0 );
-        d3dContext_->VSSetConstantBuffers( 0, 1, &mvpCB_ );
-
-        d3dContext_->Draw( 6, 0 );
-		
-    }
+	
 
 	d3dContext_->PSSetShaderResources( 0, 1, &colorMap3_ );
 	d3dContext_->IASetVertexBuffers( 0, 1, &vertexBuffer3_, &stride, &offset );
 	//Horizontal Lines
-	for( int i = 0; i < 20; i++ )
-    {
+	for(int i = 0; i < 3; i++)
+	{
         XMMATRIX world = sprites2_[i].GetWorldMatrix( );
         XMMATRIX mvp = XMMatrixMultiply( world, vpMatrix_ );
         mvp = XMMatrixTranspose( mvp );
@@ -464,15 +506,10 @@ void KeyboardDemo::Render( )
         d3dContext_->VSSetConstantBuffers( 0, 1, &mvpCB_ );
 
         d3dContext_->Draw( 6, 0 );
-		
-    }
-	*/
+	}
+	
 	//Box Position
-	GameSprite test;
-	float i = 50;
-	int j = 0;
-	while(i < 100)
-	{
+
 
 			ID3D11Resource* colorTex;
     colorMap_->GetResource( &colorTex );
@@ -508,20 +545,20 @@ void KeyboardDemo::Render( )
     D3D11_SUBRESOURCE_DATA resourceData;
     ZeroMemory( &resourceData, sizeof( resourceData ) );
     resourceData.pSysMem = pogim;
-	
-    HRESULT d3dResult = d3dDevice_->CreateBuffer( &vertexDesc, &resourceData, &vertexBuffer2_ );
+
+
+		HRESULT d3dResult = d3dDevice_->CreateBuffer( &vertexDesc, &resourceData, &vertexBuffer2_ );
 		d3dContext_->PSSetShaderResources( 0, 1, &colorMap_ );
 		d3dContext_->IASetVertexBuffers( 0, 1, &vertexBuffer2_, &stride, &offset );
-		XMFLOAT2 sprite4Pos( test.q, test.e  );
-    sprites3_[0].SetPosition( sprite4Pos );
-		XMMATRIX world = sprites3_[0].GetWorldMatrix2( );
+		XMFLOAT2 sprite4Pos( z, y2  );
+		sprites3_[0].SetPosition( sprite4Pos );
+		XMMATRIX world = sprites3_[0].GetWorldMatrix( );
         XMMATRIX mvp = XMMatrixMultiply( world, vpMatrix_ );
         mvp = XMMatrixTranspose( mvp );
-		i = i+10.0;
         d3dContext_->UpdateSubresource( mvpCB_, 0, 0, &mvp, 0, 0 );
         d3dContext_->VSSetConstantBuffers( 0, 1, &mvpCB_ );
 		d3dContext_->Draw( 6, 0 );
-	}
+	
 	//end of Box Position
 	
 	// Item to get the box
@@ -576,12 +613,6 @@ void KeyboardDemo::Render( )
 
         d3dContext_->Draw( 6, 0 );
 
-
-		if(w > 300 && w < 350 && y > 400 && y < 450)
-		{
-			PostQuitMessage(0);
-
-		}
 
 		}
 		//End of item

@@ -31,6 +31,11 @@ class KeyboardDemo : public Dx11DemoBase
 		float w;
 		float y;
 		float z;
+		float i;
+		float y2;
+		float xCoordinate;
+		float yCoordinate;
+		int direction;
     private:
 		//Drawing the Game Sprites
         ID3D11VertexShader* solidColorVS_;
@@ -44,6 +49,7 @@ class KeyboardDemo : public Dx11DemoBase
         ID3D11BlendState* alphaBlendState_;
 
         GameSprite sprites_[50];
+		float numbers_[5];
 		GameSprite sprites2_[30];
 		GameSprite sprites3_[5];
         ID3D11Buffer* mvpCB_;

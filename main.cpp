@@ -39,7 +39,6 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine
 
     if( !hwnd )
         return -1;
-
     ShowWindow( hwnd, cmdShow );
 
     KeyboardDemo demo;
@@ -49,13 +48,9 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine
 
     if( result == false )
         return -1;
-
     MSG msg = { 0 };
-
     while( msg.message != WM_QUIT )
     {
-		test.e = test.e + 20;
-		test.q = test.q + 20;
         if( PeekMessage( &msg, 0, 0, 0, PM_REMOVE ) )
         {
             TranslateMessage( &msg );
@@ -64,6 +59,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE prevInstance, LPWSTR cmdLine
         // Update and Draw
         demo.Update( 0.0f );
 		demo.Render( );
+		Sleep(25);
     }
 
     // Demo Shutdown

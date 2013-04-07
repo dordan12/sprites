@@ -31,15 +31,15 @@ XMMATRIX GameSprite::GetWorldMatrix( )
 
     return translation * rotationZ * scale;
 }
-XMMATRIX GameSprite::GetWorldMatrix2( )
+/*XMMATRIX GameSprite::GetWorldMatrix2( )
 {
-    XMMATRIX translation = XMMatrixTranslation( (float)(75.0f+q) , (float)(e), 0.5f );
+    XMMATRIX translation = XMMatrixTranslation( w , z, 0.5f );
     XMMATRIX rotationZ = XMMatrixRotationZ( rotation_ );
     XMMATRIX scale = XMMatrixScaling( scale_.x, scale_.y, 1.0f );
 
     return translation * rotationZ * scale;
 }
-
+*/
 void GameSprite::SetPosition( XMFLOAT2& position )
 {
     position_ = position;
@@ -55,4 +55,12 @@ void GameSprite::SetRotation( float rotation )
 void GameSprite::SetScale( XMFLOAT2& scale )
 {
     scale_ = scale;
+}
+int GameSprite::GetPositionX( )
+{
+	return position_.x;
+}
+int GameSprite::GetPositionY( )
+{
+	return position_.y;
 }

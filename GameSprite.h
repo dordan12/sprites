@@ -19,10 +19,12 @@ class GameSprite
         virtual ~GameSprite( );
 
         XMMATRIX GetWorldMatrix( );
-		XMMATRIX GetWorldMatrix2( );
+		XMMATRIX GetWorldMatrix2(float x, float y );
         void SetPosition( XMFLOAT2& position );
         void SetRotation( float rotation );
         void SetScale( XMFLOAT2& scale );
+		int GetPositionX();
+		int GetPositionY();
 		int e;
 		int q;
 
